@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CrashDetector : MonoBehaviour
 {
@@ -9,7 +10,13 @@ public class CrashDetector : MonoBehaviour
         if (other.gameObject.layer == layerIndex)
         {
             Debug.Log("Player has crashed!");
-            //TODO: You can add additional logic here, such as triggering a game over condition or restarting the level.
+            Invoke(nameof(ReloadScene), 1f); // Reload the scene after 1 seconds
         }
+    }
+
+    void ReloadScene()
+    {
+        // Reload the current scene
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
