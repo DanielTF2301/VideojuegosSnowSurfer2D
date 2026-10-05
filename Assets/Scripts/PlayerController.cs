@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,13 +8,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float boostSpeed = 35f;
     [SerializeField] private ParticleSystem snowEffect; // Particle system for the snow effect
     [SerializeField] private ParticleSystem boostEffect; // Particle system for the boost effect
+    [SerializeField] private ScoreManager scoreManager; // Reference to the ScoreManager script
 
     private bool canControlPlayer = true; // Flag to control player input
-    
     SurfaceEffector2D surfaceEffector2D;
     float baseSpeed;
     InputAction moveAction;
     Vector2 moveInput;
+    float previousRotation; // Variable to store the previous rotation of the player
+    float totalRotation; // Variable to store the total rotation of the player
+    int flipCount; // Variable to store the number of flips performed by the player
     Rigidbody2D rb;
 
     public bool CanControlPlayer { get => canControlPlayer; set => canControlPlayer = value; }
@@ -33,6 +37,23 @@ public class PlayerController : MonoBehaviour
         if (!canControlPlayer) return; // If player control is disabled, exit the Update method
         PlayerTorque();
         BoostPlayer();
+        CalculateFlips();
+    }
+
+    /// <summary>
+    /// Calculates the number of flips the player has performed based on their rotation.
+    /// </summary>
+    private void CalculateFlips()
+    {
+        float currentRotation = transform.rotation.eulerAngles.z; // Get the current rotation of the player in degrees
+        totalRotation += Mathf.DeltaAngle(previousRotation, currentRotation); // Calculate the change in rotation since the last frame
+        if (Mathf.Abs(totalRotation) >= 340) // Check if the total rotation exceeds 360 degrees
+        {
+            flipCount++; // Increment the flip count
+            scoreManager.AddScore(flipCount*100); // Update the score based on the number of flips
+            totalRotation = 0; // Reset the total rotation
+        }
+        previousRotation = currentRotation; // Update the previous rotation for the next frame
     }
 
     /// <summary>
