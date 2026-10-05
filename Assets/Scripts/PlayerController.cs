@@ -5,12 +5,19 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float torqueAmount = 1f;
     [SerializeField] private float boostSpeed = 35f;
+    [SerializeField] private ParticleSystem snowEffect; // Particle system for the snow effect
     [SerializeField] private ParticleSystem boostEffect; // Particle system for the boost effect
+
+    private bool canControlPlayer = true; // Flag to control player input
+    
     SurfaceEffector2D surfaceEffector2D;
     float baseSpeed;
     InputAction moveAction;
     Vector2 moveInput;
     Rigidbody2D rb;
+
+    public bool CanControlPlayer { get => canControlPlayer; set => canControlPlayer = value; }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -23,6 +30,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!canControlPlayer) return; // If player control is disabled, exit the Update method
         PlayerTorque();
         BoostPlayer();
     }
@@ -61,8 +69,14 @@ public class PlayerController : MonoBehaviour
         int layerIndex = LayerMask.NameToLayer("Floor");
         if (collision.gameObject.layer == layerIndex)
         {
-            Debug.Log("Player is on the floor");
-            boostEffect.Play(); // Play the boost particle effect
+            if (moveInput.y > 0)
+            {
+                boostEffect.Play(); // Play the boost particle effect when boosting on the floor
+            }
+            else
+            {
+                snowEffect.Play(); // Play the snow particle effect
+            }
         }
     }
 
@@ -72,6 +86,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.layer == layerIndex)
         {
             Debug.Log("Player has left the floor");
+            snowEffect.Stop(); // Stop the snow particle effect
             boostEffect.Stop(); // Stop the boost particle effect
         }
     }

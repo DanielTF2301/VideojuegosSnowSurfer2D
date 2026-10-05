@@ -5,6 +5,13 @@ public class CrashDetector : MonoBehaviour
 {
     [SerializeField] private float reloadDelay = 1f; // Delay before reloading the scene in seconds
     [SerializeField] private ParticleSystem finishEffect; // Particle system for the finish line effect
+
+    PlayerController playerController;
+
+    void Start()
+    {
+        playerController = FindAnyObjectByType<PlayerController>();
+    }
     
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -13,6 +20,7 @@ public class CrashDetector : MonoBehaviour
         if (other.gameObject.layer == layerIndex)
         {
             Debug.Log("Player has crashed!");
+            playerController.CanControlPlayer = false; // Disable player control
             finishEffect.Play(); // Play the finish line particle effect
             Invoke(nameof(ReloadScene), reloadDelay); // Reload the scene after the specified delay
         }
