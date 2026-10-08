@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     float previousRotation; // Variable to store the previous rotation of the player
     float totalRotation; // Variable to store the total rotation of the player
     int flipCount; // Variable to store the number of flips performed by the player
+    int activatePowerUpsCount;
     Rigidbody2D rb;
 
     public bool CanControlPlayer { get => canControlPlayer; set => canControlPlayer = value; }
@@ -109,6 +110,30 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Player has left the floor");
             snowEffect.Stop(); // Stop the snow particle effect
             boostEffect.Stop(); // Stop the boost particle effect
+        }
+    }
+
+    public void ApplyPowerUp(PowerUpScriptableObject powerUpData)
+    {
+        activatePowerUpsCount++;
+        if (powerUpData.PowerUpType == "Speed")
+        {
+            baseSpeed += powerUpData.PowerUpValue; // Increase the base speed of the SurfaceEffector2D
+            boostSpeed += powerUpData.PowerUpValue; // Increase the boost speed of the SurfaceEffector2D
+        }
+        
+    }
+
+    public void DeactivatePowerUp(PowerUpScriptableObject powerUpData)
+    {
+        activatePowerUpsCount--;
+        if (activatePowerUpsCount == 0)
+        {
+            if (powerUpData.PowerUpType == "Speed")
+            {
+                baseSpeed -= powerUpData.PowerUpValue; // Reset the base speed of the SurfaceEffector2D
+                boostSpeed -= powerUpData.PowerUpValue; // Reset the boost speed of the SurfaceEffector2D
+            }
         }
     }
 }
